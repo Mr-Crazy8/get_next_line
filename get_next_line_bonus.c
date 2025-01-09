@@ -1,16 +1,16 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   get_next_line.c                                    :+:      :+:    :+:   */
+/*   get_next_line_bonus.c                              :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: anel-men <marvin@42.fr>                    +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2025/01/05 09:27:09 by anel-men          #+#    #+#             */
-/*   Updated: 2025/01/05 09:27:12 by anel-men         ###   ########.fr       */
+/*   Created: 2025/01/05 16:18:19 by anel-men          #+#    #+#             */
+/*   Updated: 2025/01/05 16:18:38 by anel-men         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "get_next_line.h"
+#include "get_next_line_bonus.h"
 
 int	here_your_line(char *str)
 {
@@ -56,29 +56,29 @@ static char	*reading(int fd, char *buffer)
 			break ;
 	}
 	free(tmp);
-	if (count < 0 || !buffer || !*buffer)
+	if (count < 0 || !buffer || (!*buffer && count == 0))
 		return (free(buffer), buffer = NULL, NULL);
 	return (buffer);
 }
 
 char	*get_next_line(int fd)
 {
-	static char	*buffer;
+	static char	*buffer[OPEN_MAX];
 	char		*old;
 	char		*line;
 
-	if (fd < 0 || BUFFER_SIZE <= 0)
+	if (fd < 0 || BUFFER_SIZE <= 0 || fd >= OPEN_MAX)
 		return (NULL);
-	buffer = reading(fd, buffer);
-	if (!buffer)
+	buffer[fd] = reading(fd, buffer[fd]);
+	if (!buffer[fd])
 		return (NULL);
-	old = buffer;
-	line = ft_substr(buffer, 0, here_your_line(buffer) + 1);
+	old = buffer[fd];
+	line = ft_substr(buffer[fd], 0, here_your_line(buffer[fd]) + 1);
 	if (!line)
-		return (free(buffer), buffer = NULL, NULL);
-	buffer = ft_substr(buffer, here_your_line(buffer) + 1, (ft_strlen(buffer)
-				- here_your_line(buffer)));
-	if (!buffer)
+		return (free(buffer[fd]), buffer[fd] = NULL, NULL);
+	buffer[fd] = ft_substr(buffer[fd], here_your_line(buffer[fd]) + 1,
+			(ft_strlen(buffer[fd]) - here_your_line(buffer[fd])));
+	if (!buffer[fd])
 		return (free(old), free(line), NULL);
 	return (free(old), line);
 }
